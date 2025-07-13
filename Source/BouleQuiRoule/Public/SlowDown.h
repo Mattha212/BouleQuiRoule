@@ -3,18 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <Components/BoxComponent.h>
-#include "GameFramework/Actor.h"
 #include "SpecialRoad.h"
-#include "SpeedRoad.generated.h"
+#include "SlowDown.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class BOULEQUIROULE_API ASpeedRoad : public ASpecialRoad
+class BOULEQUIROULE_API ASlowDown : public ASpecialRoad
 {
 	GENERATED_BODY()
-
-public:	
-	// Sets default values for this actor's properties
 	UFUNCTION()
 	void OnActorHit(UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor,

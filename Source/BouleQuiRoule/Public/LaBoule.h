@@ -36,6 +36,7 @@ class BOULEQUIROULE_API ALaBoule : public APawn
 	float m_AccumulationValue;
 	float m_MaxAccumulationValue;
 	float m_MinAccumulationValue;
+	float m_MaxNormeVelocity;
 	FVector CurrentInput;
 
 public:
@@ -56,6 +57,7 @@ public:
 
 	void Speedy();
 	void Rebound();
+	void SlowDown();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

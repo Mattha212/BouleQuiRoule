@@ -40,6 +40,7 @@ ALaBoule::ALaBoule()
 	m_AccumulationValue = 1.0f;
 	m_MinAccumulationValue = 1.f;
 	m_MaxAccumulationValue = 3.f;
+	m_MaxNormeVelocity = 1000.0f;
 }
 
 // Called when the game starts or when spawned
@@ -104,7 +105,7 @@ void ALaBoule::Dash(const FInputActionValue& Value)
 {
 	auto velocity = m_SphereComponent->GetPhysicsLinearVelocity();
 	m_SphereComponent->SetPhysicsLinearVelocity(FVector::Zero());
-	m_SphereComponent->SetPhysicsLinearVelocity(velocity * 10.0f);
+	m_SphereComponent->SetPhysicsLinearVelocity((velocity * 10.0f).GetClampedToMaxSize(m_MaxNormeVelocity));
 }
 
 void ALaBoule::Jump(const FInputActionValue& Value)
@@ -114,7 +115,13 @@ void ALaBoule::Jump(const FInputActionValue& Value)
 
 void ALaBoule::Speedy()
 {
-	m_SphereComponent->SetPhysicsLinearVelocity(m_SphereComponent->GetPhysicsLinearVelocity() * 10.0f);
+
+	m_SphereComponent->SetPhysicsLinearVelocity((m_SphereComponent->GetPhysicsLinearVelocity() * 10.0f).GetClampedToMaxSize(m_MaxNormeVelocity));
+}
+
+void ALaBoule::SlowDown() 
+{
+	m_SphereComponent->SetPhysicsLinearVelocity((m_SphereComponent->GetPhysicsLinearVelocity() * 0.2f));
 }
 
 void ALaBoule::Rebound()
