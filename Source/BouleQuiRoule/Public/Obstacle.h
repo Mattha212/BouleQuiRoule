@@ -21,12 +21,12 @@ class BOULEQUIROULE_API AObstacle : public AActor
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
-
+	UFUNCTION()
+	void HandleHealthChange(float NewHealth);
 
 public:	
 	// Sets default values for this actor's properties
 	AObstacle();
-	void SetHealth(float NewHealth);
 	float GetHealth() const { return m_HP; }
 	
 protected:

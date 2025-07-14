@@ -36,17 +36,19 @@ ALaBoule::ALaBoule()
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm, USpringArmComponent::SocketName);
 
-	m_MoveForce = 50000;
+	m_MoveForce = 500.0f;
 	m_AccumulationValue = 1.0f;
 	m_MinAccumulationValue = 1.f;
 	m_MaxAccumulationValue = 3.f;
 	m_MaxNormeVelocity = 1000.0f;
+	m_IsJumping = false;
 }
 
 // Called when the game starts or when spawned
 void ALaBoule::BeginPlay()
 {
 	Super::BeginPlay();
+	m_SphereComponent->OnComponentHit.AddDynamic(this, &ALaBoule::OnActorHit);
 }
 
 // Called every frame
@@ -89,6 +91,19 @@ void ALaBoule::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+FVector ALaBoule::GetLinearVelocity()
+{
+	return m_SphereComponent->GetPhysicsLinearVelocity();
+}
+
+void ALaBoule::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (m_IsJumping) {
+		UE_LOG(LogTemp, Warning, TEXT("Bool reset"))
+		m_IsJumping = false;
+	}
+}
+
 void ALaBoule::MoveForward(const FInputActionValue& InputValue)
 {
 	float Value = InputValue.Get<float>();
@@ -110,7 +125,11 @@ void ALaBoule::Dash(const FInputActionValue& Value)
 
 void ALaBoule::Jump(const FInputActionValue& Value)
 {
-	m_SphereComponent->AddImpulse(FVector(0.0f, 0.0f, 35000.0f));
+	UE_LOG(LogTemp, Warning, TEXT("%s"), m_IsJumping ? TEXT("true") : TEXT("false"));
+	if (!m_IsJumping) {
+		m_SphereComponent->AddImpulse(FVector(0.0f, 0.0f, 350.0f));
+		m_IsJumping = true;
+	}
 }
 
 void ALaBoule::Speedy()

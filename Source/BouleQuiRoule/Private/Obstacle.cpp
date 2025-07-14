@@ -18,11 +18,12 @@ AObstacle::AObstacle()
 	m_HP = 100.0f;
 }
 
-void AObstacle::SetHealth(float NewHealth)
+void AObstacle::HandleHealthChange(float NewHealth)
 {
-	m_HP = NewHealth;
-	OnHealthChanged.Broadcast(m_HP);
-
+	m_HP -= NewHealth;
+	UE_LOG(LogTemp, Warning, TEXT("%f"), m_HP)
+	if (m_HP <= 0)
+		Destroy();
 }
 
 // Called when the game starts or when spawned
@@ -30,6 +31,7 @@ void AObstacle::BeginPlay()
 {
 	Super::BeginPlay();
 	m_BoxComponent->OnComponentHit.AddDynamic(this, &AObstacle::OnActorHit);
+	OnHealthChanged.AddDynamic(this, &AObstacle::HandleHealthChange);
 }
 
 // Called every frame
@@ -49,11 +51,8 @@ void AObstacle::OnActorHit(UPrimitiveComponent* HitComponent,
 	if (IsValid(boule)) {
 		
 		float velocityToValue = boule->GetVelocity().Size() / 10.0f;
-		UE_LOG(LogTemp, Warning, TEXT("%f"), velocityToValue)
-		m_HP -= velocityToValue;
-		if (m_HP <= 0.0f) {
-			Destroy();
-		}
+		OnHealthChanged.Broadcast(velocityToValue);
+
 	}
 
 }

@@ -39,6 +39,7 @@ class BOULEQUIROULE_API ALaBoule : public APawn
 	float m_MaxNormeVelocity;
 	FVector CurrentInput;
 
+	bool m_IsJumping;
 public:
 	// Sets default values for this pawn's properties
 	ALaBoule();
@@ -69,8 +70,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	FVector GetVelocity() {
-		return m_SphereComponent->GetPhysicsLinearVelocity();
-	}
+	FVector GetLinearVelocity();
+
+	UFUNCTION()
+	void OnActorHit(UPrimitiveComponent* HitComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse,
+		const FHitResult& Hit);
 
 };
