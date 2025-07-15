@@ -99,7 +99,6 @@ FVector ALaBoule::GetLinearVelocity()
 void ALaBoule::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (m_IsJumping) {
-		UE_LOG(LogTemp, Warning, TEXT("Bool reset"))
 		m_IsJumping = false;
 	}
 }
@@ -125,7 +124,6 @@ void ALaBoule::Dash(const FInputActionValue& Value)
 
 void ALaBoule::Jump(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s"), m_IsJumping ? TEXT("true") : TEXT("false"));
 	if (!m_IsJumping) {
 		m_SphereComponent->AddImpulse(FVector(0.0f, 0.0f, 350.0f));
 		m_IsJumping = true;
@@ -147,5 +145,5 @@ void ALaBoule::Rebound()
 {
 	auto velocity = -m_SphereComponent->GetPhysicsLinearVelocity();
 	m_SphereComponent->SetPhysicsLinearVelocity(FVector::Zero());
-	m_SphereComponent->SetPhysicsLinearVelocity(velocity*10.0f);
+	m_SphereComponent->SetPhysicsLinearVelocity(velocity*5.0f);
 }
