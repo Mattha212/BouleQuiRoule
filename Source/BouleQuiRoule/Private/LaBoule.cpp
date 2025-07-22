@@ -20,7 +20,6 @@ ALaBoule::ALaBoule()
 	m_SphereComponent->SetLinearDamping(1.5f);   // évite glissement
 	m_SphereComponent->SetAngularDamping(1.0f);  // évite rotation infinie
 
-
 	m_StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	m_StaticMeshComponent->SetupAttachment(m_SphereComponent);
 
@@ -33,7 +32,7 @@ ALaBoule::ALaBoule()
 	m_SpringArm->bInheritRoll = false;
 	m_SpringArm->bInheritPitch = false;
 
-	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	m_Camera = CreateDefaultSubobject<UCamera>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm, USpringArmComponent::SocketName);
 
 	m_MoveForce = 500.0f;
@@ -42,6 +41,8 @@ ALaBoule::ALaBoule()
 	m_MaxAccumulationValue = 3.f;
 	m_MaxNormeVelocity = 1000.0f;
 	m_IsJumping = false;
+	m_CanDash = true;
+	m_DashCoolDown = 3.0f;
 }
 
 // Called when the game starts or when spawned
@@ -57,21 +58,19 @@ void ALaBoule::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	FVector ForceDirection = FVector::ZeroVector;
 
-	if (Controller)
-	{
-		FRotator Rotation = Controller->GetControlRotation();
-		FRotationMatrix RotMatrix(Rotation);
+	FRotator Rotation = Controller->GetControlRotation();
+	FRotationMatrix RotMatrix(Rotation);
 
-		FVector Forward = RotMatrix.GetScaledAxis(EAxis::X);
-		FVector Right = RotMatrix.GetScaledAxis(EAxis::Y);
+	FVector Forward = RotMatrix.GetScaledAxis(EAxis::X);
+	FVector Right = RotMatrix.GetScaledAxis(EAxis::Y);
 
-		ForceDirection = (Forward * m_InputValueForward + Right * m_InputValueSide).GetClampedToMaxSize(1.0f);
-	}
+	ForceDirection = (Forward * m_InputValueForward + Right * m_InputValueSide).GetClampedToMaxSize(1.0f);
 
 	if (!ForceDirection.IsNearlyZero())
 	{
 		m_AccumulationValue = FMath::Clamp(m_AccumulationValue + 0.02f, m_MinAccumulationValue, m_MaxAccumulationValue);
 		m_SphereComponent->AddForce(ForceDirection * m_MoveForce * m_AccumulationValue);
+
 	}
 	else
 	{
@@ -80,6 +79,13 @@ void ALaBoule::Tick(float DeltaTime)
 		FVector DampingForce = -Velocity * 0.2f;
 		m_SphereComponent->AddForce(DampingForce);
 	}
+
+	if (!m_CanDash) {
+		if (GetWorld()->GetTimeSeconds() - m_LastDashTime > m_DashCoolDown) {
+			m_CanDash = true;
+		}
+	}
+
 	m_InputValueForward = 0.f;
 	m_InputValueSide = 0.f;
 
@@ -117,9 +123,14 @@ void ALaBoule::MoveRight(const FInputActionValue& InputValue)
 
 void ALaBoule::Dash(const FInputActionValue& Value)
 {
-	auto velocity = m_SphereComponent->GetPhysicsLinearVelocity();
-	m_SphereComponent->SetPhysicsLinearVelocity(FVector::Zero());
-	m_SphereComponent->SetPhysicsLinearVelocity((velocity * 10.0f).GetClampedToMaxSize(m_MaxNormeVelocity));
+	if (m_CanDash) {
+		auto velocity = m_SphereComponent->GetPhysicsLinearVelocity();
+		m_SphereComponent->SetPhysicsLinearVelocity(FVector::Zero());
+		m_SphereComponent->SetPhysicsLinearVelocity((velocity * 10.0f).GetClampedToMaxSize(m_MaxNormeVelocity));
+		m_LastDashTime = GetWorld()->GetTimeSeconds();
+		m_CanDash = false;
+	}
+
 }
 
 void ALaBoule::Jump(const FInputActionValue& Value)
@@ -130,13 +141,19 @@ void ALaBoule::Jump(const FInputActionValue& Value)
 	}
 }
 
+void ALaBoule::ForcedJump()
+{
+	m_SphereComponent->AddImpulse(FVector(0.0f, 0.0f, 750.0f));
+	m_IsJumping = true;
+}
+
 void ALaBoule::Speedy()
 {
 
 	m_SphereComponent->SetPhysicsLinearVelocity((m_SphereComponent->GetPhysicsLinearVelocity() * 10.0f).GetClampedToMaxSize(m_MaxNormeVelocity));
 }
 
-void ALaBoule::SlowDown() 
+void ALaBoule::SlowDown()
 {
 	m_SphereComponent->SetPhysicsLinearVelocity((m_SphereComponent->GetPhysicsLinearVelocity() * 0.2f));
 }
@@ -145,5 +162,5 @@ void ALaBoule::Rebound()
 {
 	auto velocity = -m_SphereComponent->GetPhysicsLinearVelocity();
 	m_SphereComponent->SetPhysicsLinearVelocity(FVector::Zero());
-	m_SphereComponent->SetPhysicsLinearVelocity(velocity*5.0f);
+	m_SphereComponent->SetPhysicsLinearVelocity(velocity * 5.0f);
 }

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include <Components/SphereComponent.h>
+#include "Camera.h"
 #include <Camera/CameraComponent.h>
 #include <GameFramework/SpringArmComponent.h>
 #include "GameFramework/PlayerController.h"
@@ -24,7 +25,10 @@ class BOULEQUIROULE_API ALaBoule : public APawn
 	UStaticMeshComponent* m_StaticMeshComponent;
 
 	UPROPERTY(EditAnywhere)
-	UCameraComponent* m_Camera;
+	UCamera* m_Camera;
+
+	UPROPERTY(EditAnywhere)
+	USceneComponent* m_CameraRoot;
 
 	UPROPERTY(EditAnywhere)
 	USpringArmComponent* m_SpringArm;
@@ -40,9 +44,14 @@ class BOULEQUIROULE_API ALaBoule : public APawn
 	FVector CurrentInput;
 
 	bool m_IsJumping;
+	bool m_CanDash;
+	float m_DashCoolDown;
+	float m_LastDashTime;
 public:
 	// Sets default values for this pawn's properties
 	ALaBoule();
+
+	USceneComponent* GetCamera() { return m_CameraRoot; }
 
 	UFUNCTION()
 	void MoveForward(const FInputActionValue& Value);
@@ -56,6 +65,7 @@ public:
 	UFUNCTION()
 	void Jump(const FInputActionValue& Value);
 
+	void ForcedJump();
 	void Speedy();
 	void Rebound();
 	void SlowDown();

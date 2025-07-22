@@ -36,6 +36,10 @@ void ABouleController::Jump(const FInputActionValue& InputValue)
 	}
 }
 
+void ABouleController::Look(const FInputActionValue& InputValue) {
+
+}
+
 
 void ABouleController::BeginPlay()
 {
@@ -63,5 +67,6 @@ void ABouleController::SetupInputComponent()
 		EIC->BindAction(m_IA_MoveSide, ETriggerEvent::Triggered, this, &ABouleController::MoveSide);
 		EIC->BindAction(m_IA_Dash, ETriggerEvent::Completed, this, &ABouleController::Dash);
 		EIC->BindAction(m_IA_Jump, ETriggerEvent::Completed, this, &ABouleController::Jump);
+		EIC->BindAction(m_IA_Look, ETriggerEvent::Completed, this, &ABouleController::Look);
 	}
 }

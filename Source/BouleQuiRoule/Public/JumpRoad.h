@@ -4,18 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "SpecialRoad.h"
-#include "ReboundRoad.generated.h"
+#include "JumpRoad.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class BOULEQUIROULE_API AReboundRoad : public ASpecialRoad
+class BOULEQUIROULE_API AJumpRoad : public ASpecialRoad
 {
 	GENERATED_BODY()
-
 	UFUNCTION()
-	void OnActorHit (UPrimitiveComponent* OverlappedComp,
+	void OnActorHit(UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,

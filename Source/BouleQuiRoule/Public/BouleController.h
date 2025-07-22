@@ -29,6 +29,9 @@ class BOULEQUIROULE_API ABouleController : public APlayerController
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* m_IA_Jump;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* m_IA_Look;
+
 public:
 	ABouleController();
 
@@ -36,6 +39,7 @@ public:
 	void MoveSide(const FInputActionValue& InputValue);
 	void Dash(const FInputActionValue& InputValue);
 	void Jump(const FInputActionValue& InputValue);
+	void Look(const FInputActionValue& InputValue);
 
 protected:
 	virtual void BeginPlay() override ;
