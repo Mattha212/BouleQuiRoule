@@ -12,8 +12,6 @@ UCLASS()
 class BOULEQUIROULE_API AObstacle : public AActor
 {
 	GENERATED_BODY()
-
-
 	
 	float m_HP;
 
@@ -21,6 +19,7 @@ class BOULEQUIROULE_API AObstacle : public AActor
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
+
 	UFUNCTION()
 	void HandleHealthChange(float NewHealth);
 

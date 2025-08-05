@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "BouleQuiRouleGameMode.generated.h"
 
+
+
 UCLASS(minimalapi)
 class ABouleQuiRouleGameMode : public AGameModeBase
 {
@@ -13,6 +15,7 @@ class ABouleQuiRouleGameMode : public AGameModeBase
 
 public:
 	ABouleQuiRouleGameMode();
+
 };
 
 

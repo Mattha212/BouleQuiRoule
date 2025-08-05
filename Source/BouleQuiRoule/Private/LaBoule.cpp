@@ -20,20 +20,25 @@ ALaBoule::ALaBoule()
 	m_SphereComponent->SetLinearDamping(1.5f);   // évite glissement
 	m_SphereComponent->SetAngularDamping(1.0f);  // évite rotation infinie
 
+	// Un pivot indépendant pour la caméra
+	m_CameraRoot = CreateDefaultSubobject<USceneComponent>(TEXT("CameraRoot"));
+	m_CameraRoot->SetupAttachment(RootComponent);
+
 	m_StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	m_StaticMeshComponent->SetupAttachment(m_SphereComponent);
 
-	m_SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	m_SpringArm->SetupAttachment(m_SphereComponent);
+	// Spring arm qui suit CameraRoot (pas la boule !)
+	m_SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	m_SpringArm->SetupAttachment(m_CameraRoot);
+	m_SpringArm->bUsePawnControlRotation = false;
 	m_SpringArm->TargetArmLength = 400.f;
 	m_SpringArm->bEnableCameraLag = true;
 	m_SpringArm->CameraLagSpeed = 3.f;
-	m_SpringArm->bInheritYaw = false;
-	m_SpringArm->bInheritRoll = false;
-	m_SpringArm->bInheritPitch = false;
 
+	// Caméra au bout
 	m_Camera = CreateDefaultSubobject<UCamera>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm, USpringArmComponent::SocketName);
+	m_Camera->bUsePawnControlRotation = false; // ne tourne pas elle-même
 
 	m_MoveForce = 500.0f;
 	m_AccumulationValue = 1.0f;
@@ -50,6 +55,7 @@ void ALaBoule::BeginPlay()
 {
 	Super::BeginPlay();
 	m_SphereComponent->OnComponentHit.AddDynamic(this, &ALaBoule::OnActorHit);
+	m_CameraRoot->SetUsingAbsoluteRotation(true);
 }
 
 // Called every frame
@@ -58,7 +64,7 @@ void ALaBoule::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	FVector ForceDirection = FVector::ZeroVector;
 
-	FRotator Rotation = Controller->GetControlRotation();
+	FRotator Rotation = m_CameraRoot->GetComponentRotation();
 	FRotationMatrix RotMatrix(Rotation);
 
 	FVector Forward = RotMatrix.GetScaledAxis(EAxis::X);
@@ -83,6 +89,18 @@ void ALaBoule::Tick(float DeltaTime)
 	if (!m_CanDash) {
 		if (GetWorld()->GetTimeSeconds() - m_LastDashTime > m_DashCoolDown) {
 			m_CanDash = true;
+		}
+	}
+
+	if (!ForceDirection.IsNearlyZero())
+	{
+		if (FMath::Abs(m_InputValueSide) > 0.0f) {
+			FRotator TargetRotation = ForceDirection.Rotation();
+			TargetRotation.Pitch = 0.f;
+			TargetRotation.Roll = 0.f;
+			FRotator CurrentRotation = m_CameraRoot->GetComponentRotation();
+			FRotator SmoothedRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 0.5f);
+			m_CameraRoot->SetWorldRotation(SmoothedRotation);
 		}
 	}
 

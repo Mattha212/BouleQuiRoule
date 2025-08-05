@@ -2,11 +2,13 @@
 
 #include "BouleController.h"
 #include "EnhancedInputComponent.h"
-#include "LaBoule.h"  // ton Pawn class
+#include "LaBoule.h" 
 
 ABouleController::ABouleController()
 {
 }
+
+
 
 void ABouleController::MoveForward(const FInputActionValue& InputValue)
 {
@@ -50,10 +52,16 @@ void ABouleController::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Sub =
 			LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 		{
-			// Priority = 1 (ou ce que tu veux)
 			Sub->AddMappingContext(m_IMC_RollingBall, 1);
 		}
 	}
+
+	//APawn* MyPawn = GetPawn();
+	//if (MyPawn && GetStartSpot())
+	//{
+	//	FRotator StartRot = GetStartSpot()->GetActorRotation();
+	//	MyPawn->SetActorRotation(StartRot);
+	//}
 
 }
 
